@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>ArchiMate — Ветеринарная платформа</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #f0f1f4;
+  font-family: 'Inter', sans-serif;
+  padding: 1.5rem;
+  min-width: 1300px;
+}
+h1 { font-size: 1rem; font-weight: 600; color: #1a1a2e; margin-bottom: 0.2rem; }
+.subtitle { font-size: 0.65rem; color: #888; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1rem; }
+
+.legend {
+  display: flex; gap: 1.2rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center;
+}
+.li { display: flex; align-items: center; gap: 0.35rem; font-size: 0.6rem; color: #555; }
+.lb { width: 16px; height: 10px; border: 1.5px solid; border-radius: 1px; }
+
+svg { display: block; }
+</style>
+</head>
+<body>
+
+<h1>ArchiMate — Платформа для записи в ветеринарные клиники</h1>
+<div class="subtitle">Enterprise Architecture · Business / Application / Technology Layers</div>
+
+<div class="legend">
+  <div class="li"><div class="lb" style="border-color:#d4920a;background:#fff8e6"></div> Actor / Role</div>
+  <div class="li"><div class="lb" style="border-color:#b87010;background:#fdefd0"></div> Business Service / Process / Object</div>
+  <div class="li"><div class="lb" style="border-color:#3a6fba;background:#e8f0ff"></div> App Component</div>
+  <div class="li"><div class="lb" style="border-color:#2a5aa0;background:#d8e8ff"></div> App Service / Interface</div>
+  <div class="li"><div class="lb" style="border-color:#3a9a55;background:#e8f8ec"></div> Node / Tech Service / Artifact</div>
+  <div class="li">
+    <svg width="36" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="#888" stroke-width="1.5" stroke-dasharray="4,2"/><polygon points="28,2 36,5 28,8" fill="#888"/></svg>
+    uses / realized by
+  </div>
+  <div class="li">
+    <svg width="36" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="#4a7fcb" stroke-width="1.5"/><polygon points="28,2 36,5 28,8" fill="#4a7fcb"/></svg>
+    serving / assignment
+  </div>
+</div>
+
+<svg id="main" xmlns="http://www.w3.org/2000/svg" width="1260" height="1650" style="background:#fff;border:1px solid #dde;border-radius:4px;">
+<defs>
+  <marker id="arr-gray" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+    <polygon points="0,0 8,3 0,6" fill="#999"/>
+  </marker>
+  <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+    <polygon points="0,0 8,3 0,6" fill="#4a7fcb"/>
+  </marker>
+  <marker id="arr-green" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+    <polygon points="0,0 8,3 0,6" fill="#3a9a55"/>
+  </marker>
+  <marker id="arr-orange" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+    <polygon points="0,0 8,3 0,6" fill="#d4920a"/>
+  </marker>
+</defs>
+
+<!-- ══════════════════════════════════
+     BUSINESS LAYER  y=20..620
+══════════════════════════════════ -->
+<rect x="10" y="20" width="1240" height="600" rx="4" fill="#fffdf5" stroke="#d4920a" stroke-width="2"/>
+<rect x="10" y="20" width="1240" height="26" rx="4" fill="#d4920a"/>
+<text x="22" y="37" fill="white" font-size="11" font-weight="600" font-family="Inter" letter-spacing="1">BUSINESS LAYER — Бизнес-слой</text>
+
+<!-- row labels -->
+<text x="22" y="82" fill="#b87010" font-size="8.5" font-weight="600" font-family="Inter" letter-spacing="1">ACTORS</text>
+<text x="22" y="182" fill="#b87010" font-size="8.5" font-weight="600" font-family="Inter" letter-spacing="1">ROLES</text>
+<text x="22" y="282" fill="#b87010" font-size="8.5" font-weight="600" font-family="Inter" letter-spacing="1">SERVICES</text>
+<text x="22" y="422" fill="#b87010" font-size="8.5" font-weight="600" font-family="Inter" letter-spacing="1">PROCESSES</text>
+<text x="22" y="532" fill="#b87010" font-size="8.5" font-weight="600" font-family="Inter" letter-spacing="1">OBJECTS</text>
+
+<!-- helper: element box macro -->
+<!-- ACTORS row y=88 -->
+<!-- Владелец питомца -->
+<rect x="110" y="62" width="145" height="44" rx="2" fill="#fff8e6" stroke="#d4920a" stroke-width="1.5"/>
+<text x="130" y="79" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Actor</text>
+<text x="130" y="93" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">👤 Владелец питомца</text>
+
+<!-- Ветеринар -->
+<rect x="268" y="62" width="130" height="44" rx="2" fill="#fff8e6" stroke="#d4920a" stroke-width="1.5"/>
+<text x="286" y="79" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Actor</text>
+<text x="286" y="93" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">👨‍⚕️ Ветеринар</text>
+
+<!-- Администратор -->
+<rect x="412" y="62" width="160" height="44" rx="2" fill="#fff8e6" stroke="#d4920a" stroke-width="1.5"/>
+<text x="430" y="79" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Actor</text>
+<text x="430" y="93" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">🧑‍💼 Администратор</text>
+
+<!-- Клиника -->
+<rect x="586" y="62" width="130" height="44" rx="2" fill="#fff8e6" stroke="#d4920a" stroke-width="1.5"/>
+<text x="604" y="79" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Actor</text>
+<text x="604" y="93" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">🏥 Клиника</text>
+
+<!-- Платформа -->
+<rect x="730" y="62" width="130" height="44" rx="2" fill="#fff8e6" stroke="#d4920a" stroke-width="1.5"/>
+<text x="748" y="79" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Actor</text>
+<text x="748" y="93" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">🌐 Платформа</text>
+
+<!-- ROLES row y=158 -->
+<!-- Пациент -->
+<rect x="110" y="158" width="130" height="44" rx="2" fill="#fff0d0" stroke="#c07818" stroke-width="1.5"/>
+<text x="128" y="175" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Role</text>
+<text x="128" y="189" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">🐾 Пациент</text>
+
+<!-- Поставщик услуг -->
+<rect x="268" y="158" width="155" height="44" rx="2" fill="#fff0d0" stroke="#c07818" stroke-width="1.5"/>
+<text x="286" y="175" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Role</text>
+<text x="286" y="189" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">🏪 Поставщик услуг</text>
+
+<!-- SERVICES row y=258 -->
+<rect x="110" y="258" width="145" height="44" rx="2" fill="#fdefd0" stroke="#b87010" stroke-width="1.5"/>
+<text x="128" y="275" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Service</text>
+<text x="128" y="289" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">🔍 Поиск специалиста</text>
+
+<rect x="268" y="258" width="145" height="44" rx="2" fill="#fdefd0" stroke="#b87010" stroke-width="1.5"/>
+<text x="286" y="275" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Service</text>
+<text x="286" y="289" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">📅 Запись на приём</text>
+
+<rect x="426" y="258" width="150" height="44" rx="2" fill="#fdefd0" stroke="#b87010" stroke-width="1.5"/>
+<text x="444" y="275" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Service</text>
+<text x="444" y="289" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">🔄 Отмена / перенос</text>
+
+<rect x="590" y="258" width="150" height="44" rx="2" fill="#fdefd0" stroke="#b87010" stroke-width="1.5"/>
+<text x="608" y="275" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Service</text>
+<text x="608" y="289" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">🔔 Уведомление</text>
+
+<rect x="754" y="258" width="145" height="44" rx="2" fill="#fdefd0" stroke="#b87010" stroke-width="1.5"/>
+<text x="772" y="275" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Service</text>
+<text x="772" y="289" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">⭐ Отзыв и оценка</text>
+
+<rect x="912" y="258" width="150" height="44" rx="2" fill="#fdefd0" stroke="#b87010" stroke-width="1.5"/>
+<text x="930" y="275" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Service</text>
+<text x="930" y="289" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">📊 Аналитика</text>
+
+<rect x="1075" y="258" width="155" height="44" rx="2" fill="#fdefd0" stroke="#b87010" stroke-width="1.5"/>
+<text x="1093" y="275" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Service</text>
+<text x="1093" y="289" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">🗓️ Расписание</text>
+
+<!-- PROCESSES row y=398 -->
+<rect x="110" y="398" width="165" height="44" rx="2" fill="#fce8c0" stroke="#a86005" stroke-width="1.5"/>
+<text x="128" y="415" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Process</text>
+<text x="128" y="429" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">⚙️ Процесс записи</text>
+
+<rect x="290" y="398" width="165" height="44" rx="2" fill="#fce8c0" stroke="#a86005" stroke-width="1.5"/>
+<text x="308" y="415" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Process</text>
+<text x="308" y="429" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">✅ Подтверждение</text>
+
+<rect x="470" y="398" width="165" height="44" rx="2" fill="#fce8c0" stroke="#a86005" stroke-width="1.5"/>
+<text x="488" y="415" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Process</text>
+<text x="488" y="429" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">💬 Оценка визита</text>
+
+<rect x="650" y="398" width="180" height="44" rx="2" fill="#fce8c0" stroke="#a86005" stroke-width="1.5"/>
+<text x="668" y="415" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Process</text>
+<text x="668" y="429" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">📋 Упр. расписанием</text>
+
+<!-- OBJECTS row y=508 -->
+<rect x="110" y="508" width="145" height="44" rx="2" fill="#f8dfb0" stroke="#986000" stroke-width="1.5"/>
+<text x="128" y="525" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Object</text>
+<text x="128" y="539" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">📄 Запись (Appointment)</text>
+
+<rect x="270" y="508" width="135" height="44" rx="2" fill="#f8dfb0" stroke="#986000" stroke-width="1.5"/>
+<text x="288" y="525" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Object</text>
+<text x="288" y="539" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">🐕 Профиль питомца</text>
+
+<rect x="420" y="508" width="135" height="44" rx="2" fill="#f8dfb0" stroke="#986000" stroke-width="1.5"/>
+<text x="438" y="525" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Object</text>
+<text x="438" y="539" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">👨‍⚕️ Профиль врача</text>
+
+<rect x="570" y="508" width="120" height="44" rx="2" fill="#f8dfb0" stroke="#986000" stroke-width="1.5"/>
+<text x="588" y="525" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Object</text>
+<text x="588" y="539" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">💬 Отзыв</text>
+
+<rect x="705" y="508" width="130" height="44" rx="2" fill="#f8dfb0" stroke="#986000" stroke-width="1.5"/>
+<text x="723" y="525" fill="#7a4f00" font-size="7.5" font-family="Inter">Business Object</text>
+<text x="723" y="539" fill="#3a2000" font-size="9" font-weight="500" font-family="Inter">🗓️ Расписание</text>
+
+<!-- ══ BUSINESS INTERNAL ARROWS ══ -->
+<!-- Actors → Roles -->
+<line x1="182" y1="106" x2="175" y2="158" stroke="#d4920a" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arr-orange)"/>
+<text x="116" y="138" fill="#b87010" font-size="7" font-family="Inter">assigned to</text>
+
+<line x1="651" y1="106" x2="346" y2="158" stroke="#d4920a" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arr-orange)"/>
+<text x="470" y="130" fill="#b87010" font-size="7" font-family="Inter">assigned to</text>
+
+<!-- Владелец → Services -->
+<line x1="182" y1="106" x2="182" y2="258" stroke="#999" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-gray)"/>
+<line x1="182" y1="106" x2="341" y2="258" stroke="#999" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-gray)"/>
+<line x1="182" y1="106" x2="826" y2="258" stroke="#999" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-gray)"/>
+<text x="240" y="190" fill="#888" font-size="7" font-family="Inter">uses</text>
+
+<!-- Администратор → Расписание -->
+<line x1="492" y1="106" x2="1152" y2="258" stroke="#999" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-gray)"/>
+
+<!-- Клиника → Аналитика -->
+<line x1="651" y1="106" x2="987" y2="258" stroke="#999" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-gray)"/>
+<text x="790" y="175" fill="#888" font-size="7" font-family="Inter">uses</text>
+
+<!-- Process trigger -->
+<line x1="275" y1="420" x2="290" y2="420" stroke="#d4920a" stroke-width="1.2" marker-end="url(#arr-orange)"/>
+<text x="216" y="415" fill="#b87010" font-size="7" font-family="Inter">triggers</text>
+
+<!-- ══════════════════════════════════
+     APPLICATION LAYER  y=640..1060
+══════════════════════════════════ -->
+<rect x="10" y="640" width="1240" height="420" rx="4" fill="#f5f8ff" stroke="#3a6fba" stroke-width="2"/>
+<rect x="10" y="640" width="1240" height="26" rx="4" fill="#3a6fba"/>
+<text x="22" y="657" fill="white" font-size="11" font-weight="600" font-family="Inter" letter-spacing="1">APPLICATION LAYER — Слой приложений</text>
+
+<text x="22" y="700" fill="#2a5aa0" font-size="8.5" font-weight="600" font-family="Inter" letter-spacing="1">COMPONENTS</text>
+<text x="22" y="820" fill="#2a5aa0" font-size="8.5" font-weight="600" font-family="Inter" letter-spacing="1">SERVICES</text>
+<text x="22" y="970" fill="#2a5aa0" font-size="8.5" font-weight="600" font-family="Inter" letter-spacing="1">INTERFACES</text>
+
+<!-- App Components row y=706 -->
+<rect x="110" y="676" width="145" height="44" rx="2" fill="#e8f0ff" stroke="#3a6fba" stroke-width="1.5"/>
+<text x="128" y="693" fill="#1a3a6b" font-size="7.5" font-family="Inter">App Component</text>
+<text x="128" y="707" fill="#0a1a3a" font-size="9" font-weight="500" font-family="Inter">💻 Клиентский портал</text>
+
+<rect x="268" y="676" width="145" height="44" rx="2" fill="#e8f0ff" stroke="#3a6fba" stroke-width="1.5"/>
+<text x="286" y="693" fill="#1a3a6b" font-size="7.5" font-family="Inter">App Component</text>
+<text x="286" y="707" fill="#0a1a3a" font-size="9" font-weight="500" font-family="Inter">🖥️ Панель клиники</text>
+
+<rect x="426" y="676" width="165" height="44" rx="2" fill="#e8f0ff" stroke="#3a6fba" stroke-width="1.5"/>
+<text x="444" y="693" fill="#1a3a6b" font-size="7.5" font-family="Inter">App Component</text>
+<text x="444" y="707" fill="#0a1a3a" font-size="9" font-weight="500" font-family="Inter">🔍 Сервис поиска/записи</text>
+
+<rect x="604" y="676" width="155" height="44" rx="2" fill="#e8f0ff" stroke="#3a6fba" stroke-width="1.5"/>
+<text x="622" y="693" fill="#1a3a6b" font-size="7.5" font-family="Inter">App Component</text>
+<text x="622" y="707" fill="#0a1a3a" font-size="9" font-weight="500" font-family="Inter">📧 Сервис уведомлений</text>
+
+<rect x="772" y="676" width="145" height="44" rx="2" fill="#e8f0ff" stroke="#3a6fba" stroke-width="1.5"/>
+<text x="790" y="693" fill="#1a3a6b" font-size="7.5" font-family="Inter">App Component</text>
+<text x="790" y="707" fill="#0a1a3a" font-size="9" font-weight="500" font-family="Inter">📊 Сервис аналитики</text>
+
+<rect x="930" y="676" width="145" height="44" rx="2" fill="#e8f0ff" stroke="#3a6fba" stroke-width="1.5"/>
+<text x="948" y="693" fill="#1a3a6b" font-size="7.5" font-family="Inter">App Component</text>
+<text x="948" y="707" fill="#0a1a3a" font-size="9" font-weight="500" font-family="Inter">⭐ Сервис отзывов</text>
+
+<rect x="1088" y="676" width="140" height="44" rx="2" fill="#e8f0ff" stroke="#3a6fba" stroke-width="1.5"/>
+<text x="1106" y="693" fill="#1a3a6b" font-size="7.5" font-family="Inter">App Component</text>
+<text x="1106" y="707" fill="#0a1a3a" font-size="9" font-weight="500" font-family="Inter">🚪 API Gateway</text>
+
+<!-- App Services row y=796 -->
+<rect x="110" y="796" width="150" height="44" rx="2" fill="#d8e8ff" stroke="#2a5aa0" stroke-width="1.5"/>
+<text x="128" y="813" fill="#152e5a" font-size="7.5" font-family="Inter">App Service</text>
+<text x="128" y="827" fill="#060e20" font-size="9" font-weight="500" font-family="Inter">🔎 Поиск слотов</text>
+
+<rect x="274" y="796" width="150" height="44" rx="2" fill="#d8e8ff" stroke="#2a5aa0" stroke-width="1.5"/>
+<text x="292" y="813" fill="#152e5a" font-size="7.5" font-family="Inter">App Service</text>
+<text x="292" y="827" fill="#060e20" font-size="9" font-weight="500" font-family="Inter">➕ Создание записи</text>
+
+<rect x="438" y="796" width="155" height="44" rx="2" fill="#d8e8ff" stroke="#2a5aa0" stroke-width="1.5"/>
+<text x="456" y="813" fill="#152e5a" font-size="7.5" font-family="Inter">App Service</text>
+<text x="456" y="827" fill="#060e20" font-size="9" font-weight="500" font-family="Inter">✉️ Отправка подтверждения</text>
+
+<rect x="607" y="796" width="145" height="44" rx="2" fill="#d8e8ff" stroke="#2a5aa0" stroke-width="1.5"/>
+<text x="625" y="813" fill="#152e5a" font-size="7.5" font-family="Inter">App Service</text>
+<text x="625" y="827" fill="#060e20" font-size="9" font-weight="500" font-family="Inter">⏰ Напоминание</text>
+
+<rect x="766" y="796" width="150" height="44" rx="2" fill="#d8e8ff" stroke="#2a5aa0" stroke-width="1.5"/>
+<text x="784" y="813" fill="#152e5a" font-size="7.5" font-family="Inter">App Service</text>
+<text x="784" y="827" fill="#060e20" font-size="9" font-weight="500" font-family="Inter">📈 Агрегация статистики</text>
+
+<rect x="930" y="796" width="145" height="44" rx="2" fill="#d8e8ff" stroke="#2a5aa0" stroke-width="1.5"/>
+<text x="948" y="813" fill="#152e5a" font-size="7.5" font-family="Inter">App Service</text>
+<text x="948" y="827" fill="#060e20" font-size="9" font-weight="500" font-family="Inter">🔐 Аутентификация</text>
+
+<!-- Interfaces row y=946 -->
+<rect x="110" y="946" width="130" height="44" rx="2" fill="#c8d8f8" stroke="#1a4890" stroke-width="1.5"/>
+<text x="128" y="963" fill="#0a1e4a" font-size="7.5" font-family="Inter">App Interface</text>
+<text x="128" y="977" fill="#040c20" font-size="9" font-weight="500" font-family="Inter">⚡ REST API</text>
+
+<rect x="254" y="946" width="155" height="44" rx="2" fill="#c8d8f8" stroke="#1a4890" stroke-width="1.5"/>
+<text x="272" y="963" fill="#0a1e4a" font-size="7.5" font-family="Inter">App Interface</text>
+<text x="272" y="977" fill="#040c20" font-size="9" font-weight="500" font-family="Inter">🖥️ Web UI (клиент)</text>
+
+<rect x="423" y="946" width="155" height="44" rx="2" fill="#c8d8f8" stroke="#1a4890" stroke-width="1.5"/>
+<text x="441" y="963" fill="#0a1e4a" font-size="7.5" font-family="Inter">App Interface</text>
+<text x="441" y="977" fill="#040c20" font-size="9" font-weight="500" font-family="Inter">🖥️ Web UI (клиника)</text>
+
+<!-- ══ APP INTERNAL ARROWS ══ -->
+<!-- Components → Services -->
+<line x1="509" y1="720" x2="349" y2="796" stroke="#4a7fcb" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+<line x1="509" y1="720" x2="185" y2="796" stroke="#4a7fcb" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+<text x="310" y="760" fill="#3a6fba" font-size="7" font-family="Inter">exposes</text>
+
+<line x1="681" y1="720" x2="515" y2="796" stroke="#4a7fcb" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+<line x1="681" y1="720" x2="679" y2="796" stroke="#4a7fcb" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+<text x="630" y="760" fill="#3a6fba" font-size="7" font-family="Inter">exposes</text>
+
+<line x1="844" y1="720" x2="841" y2="796" stroke="#4a7fcb" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+<line x1="1002" y1="720" x2="1002" y2="796" stroke="#4a7fcb" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+
+<!-- Services → Interfaces -->
+<line x1="185" y1="840" x2="175" y2="946" stroke="#4a7fcb" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+<line x1="349" y1="840" x2="331" y2="946" stroke="#4a7fcb" stroke-width="1.2" marker-end="url(#arr-blue)"/>
+<text x="148" y="900" fill="#3a6fba" font-size="7" font-family="Inter">via</text>
+
+<!-- ══════════════════════════
+     BIZ → APP ARROWS (between layers)
+══════════════════════════ -->
+<!-- Поиск специалиста → Сервис поиска/записи -->
+<line x1="182" y1="302" x2="509" y2="676" stroke="#999" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arr-gray)"/>
+<text x="270" y="490" fill="#888" font-size="7.5" font-family="Inter" transform="rotate(-35,270,490)">realized by</text>
+
+<!-- Запись на приём → Сервис поиска/записи -->
+<line x1="341" y1="302" x2="509" y2="676" stroke="#999" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arr-gray)"/>
+
+<!-- Уведомление → Сервис уведомлений -->
+<line x1="665" y1="302" x2="681" y2="676" stroke="#999" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arr-gray)"/>
+<text x="640" y="480" fill="#888" font-size="7.5" font-family="Inter">realized by</text>
+
+<!-- Отзыв и оценка → Сервис отзывов -->
+<line x1="826" y1="302" x2="1002" y2="676" stroke="#999" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arr-gray)"/>
+
+<!-- Аналитика → Сервис аналитики -->
+<line x1="987" y1="302" x2="844" y2="676" stroke="#999" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arr-gray)"/>
+
+<!-- Владелец → Клиентский портал -->
+<line x1="182" y1="106" x2="182" y2="676" stroke="#d4920a" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arr-orange)"/>
+<text x="186" y="400" fill="#c07818" font-size="7" font-family="Inter">uses</text>
+
+<!-- Администратор → Панель клиники -->
+<line x1="492" y1="106" x2="340" y2="676" stroke="#d4920a" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arr-orange)"/>
+
+<!-- ══════════════════════════════════
+     TECHNOLOGY LAYER  y=1080..1630
+══════════════════════════════════ -->
+<rect x="10" y="1080" width="1240" height="550" rx="4" fill="#f5fff7" stroke="#3a9a55" stroke-width="2"/>
+<rect x="10" y="1080" width="1240" height="26" rx="4" fill="#3a9a55"/>
+<text x="22" y="1097" fill="white" font-size="11" font-weight="600" font-family="Inter" letter-spacing="1">TECHNOLOGY LAYER — Технологический слой</text>
+
+<text x="22" y="1140" fill="#2a7040" font-size="8.5" font-weight="600" font-family="Inter" letter-spacing="1">NODES</text>
+<text x="22" y="1270" fill="#2a7040" font-size="8.5" font-weight="600" font-family="Inter" letter-spacing="1">TECH SERVICES</text>
+<text x="22" y="1420" fill="#2a7040" font-size="8.5" font-weight="600" font-family="Inter" letter-spacing="1">ARTIFACTS</text>
+
+<!-- Nodes row y=1116 -->
+<rect x="110" y="1116" width="145" height="44" rx="2" fill="#e8f8ec" stroke="#3a9a55" stroke-width="1.5"/>
+<text x="128" y="1133" fill="#1a4d28" font-size="7.5" font-family="Inter">Node</text>
+<text x="128" y="1147" fill="#081810" font-size="9" font-weight="500" font-family="Inter">🖥️ Веб-сервер</text>
+
+<rect x="268" y="1116" width="155" height="44" rx="2" fill="#e8f8ec" stroke="#3a9a55" stroke-width="1.5"/>
+<text x="286" y="1133" fill="#1a4d28" font-size="7.5" font-family="Inter">Node</text>
+<text x="286" y="1147" fill="#081810" font-size="9" font-weight="500" font-family="Inter">🗄️ БД транзакционная</text>
+
+<rect x="436" y="1116" width="155" height="44" rx="2" fill="#e8f8ec" stroke="#3a9a55" stroke-width="1.5"/>
+<text x="454" y="1133" fill="#1a4d28" font-size="7.5" font-family="Inter">Node</text>
+<text x="454" y="1147" fill="#081810" font-size="9" font-weight="500" font-family="Inter">🗄️ БД аналитическая</text>
+
+<rect x="604" y="1116" width="155" height="44" rx="2" fill="#e8f8ec" stroke="#3a9a55" stroke-width="1.5"/>
+<text x="622" y="1133" fill="#1a4d28" font-size="7.5" font-family="Inter">Node</text>
+<text x="622" y="1147" fill="#081810" font-size="9" font-weight="500" font-family="Inter">📨 Брокер сообщений</text>
+
+<rect x="772" y="1116" width="145" height="44" rx="2" fill="#e8f8ec" stroke="#3a9a55" stroke-width="1.5"/>
+<text x="790" y="1133" fill="#1a4d28" font-size="7.5" font-family="Inter">Node</text>
+<text x="790" y="1147" fill="#081810" font-size="9" font-weight="500" font-family="Inter">📮 Почтовый сервер</text>
+
+<rect x="930" y="1116" width="130" height="44" rx="2" fill="#e8f8ec" stroke="#3a9a55" stroke-width="1.5"/>
+<text x="948" y="1133" fill="#1a4d28" font-size="7.5" font-family="Inter">Node</text>
+<text x="948" y="1147" fill="#081810" font-size="9" font-weight="500" font-family="Inter">🌍 CDN</text>
+
+<!-- Tech Services row y=1246 -->
+<rect x="110" y="1246" width="145" height="44" rx="2" fill="#d8f0de" stroke="#2a7840" stroke-width="1.5"/>
+<text x="128" y="1263" fill="#143d20" font-size="7.5" font-family="Inter">Tech Service</text>
+<text x="128" y="1277" fill="#060f08" font-size="9" font-weight="500" font-family="Inter">💾 Хранение данных</text>
+
+<rect x="268" y="1246" width="155" height="44" rx="2" fill="#d8f0de" stroke="#2a7840" stroke-width="1.5"/>
+<text x="286" y="1263" fill="#143d20" font-size="7.5" font-family="Inter">Tech Service</text>
+<text x="286" y="1277" fill="#060f08" font-size="9" font-weight="500" font-family="Inter">🔗 Передача сообщений</text>
+
+<rect x="436" y="1246" width="145" height="44" rx="2" fill="#d8f0de" stroke="#2a7840" stroke-width="1.5"/>
+<text x="454" y="1263" fill="#143d20" font-size="7.5" font-family="Inter">Tech Service</text>
+<text x="454" y="1277" fill="#060f08" font-size="9" font-weight="500" font-family="Inter">📧 Отправка email</text>
+
+<rect x="594" y="1246" width="145" height="44" rx="2" fill="#d8f0de" stroke="#2a7840" stroke-width="1.5"/>
+<text x="612" y="1263" fill="#143d20" font-size="7.5" font-family="Inter">Tech Service</text>
+<text x="612" y="1277" fill="#060f08" font-size="9" font-weight="500" font-family="Inter">🔒 HTTPS</text>
+
+<!-- Artifacts row y=1396 -->
+<rect x="110" y="1396" width="185" height="44" rx="2" fill="#c8e8d0" stroke="#1a6030" stroke-width="1.5"/>
+<text x="128" y="1413" fill="#0e2e18" font-size="7.5" font-family="Inter">Artifact</text>
+<text x="128" y="1427" fill="#040c08" font-size="9" font-weight="500" font-family="Inter">📦 БД записей и пользователей</text>
+
+<rect x="310" y="1396" width="185" height="44" rx="2" fill="#c8e8d0" stroke="#1a6030" stroke-width="1.5"/>
+<text x="328" y="1413" fill="#0e2e18" font-size="7.5" font-family="Inter">Artifact</text>
+<text x="328" y="1427" fill="#040c08" font-size="9" font-weight="500" font-family="Inter">📦 БД аналитики и отзывов</text>
+
+<rect x="510" y="1396" width="155" height="44" rx="2" fill="#c8e8d0" stroke="#1a6030" stroke-width="1.5"/>
+<text x="528" y="1413" fill="#0e2e18" font-size="7.5" font-family="Inter">Artifact</text>
+<text x="528" y="1427" fill="#040c08" font-size="9" font-weight="500" font-family="Inter">📦 Очередь событий</text>
+
+<!-- ══ TECH INTERNAL ARROWS ══ -->
+<line x1="182" y1="1160" x2="182" y2="1246" stroke="#3a9a55" stroke-width="1.2" marker-end="url(#arr-green)"/>
+<line x1="346" y1="1160" x2="182" y2="1246" stroke="#3a9a55" stroke-width="1.2" marker-end="url(#arr-green)"/>
+<line x1="514" y1="1160" x2="346" y2="1246" stroke="#3a9a55" stroke-width="1.2" marker-end="url(#arr-green)"/>
+<line x1="681" y1="1160" x2="346" y2="1246" stroke="#3a9a55" stroke-width="1.2" marker-end="url(#arr-green)"/>
+<line x1="844" y1="1160" x2="514" y2="1246" stroke="#3a9a55" stroke-width="1.2" marker-end="url(#arr-green)"/>
+<text x="440" y="1210" fill="#2a7040" font-size="7" font-family="Inter">hosts</text>
+
+<!-- Nodes → Artifacts -->
+<line x1="346" y1="1160" x2="202" y2="1396" stroke="#3a9a55" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arr-green)"/>
+<line x1="514" y1="1160" x2="402" y2="1396" stroke="#3a9a55" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arr-green)"/>
+<line x1="681" y1="1160" x2="587" y2="1396" stroke="#3a9a55" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arr-green)"/>
+<text x="560" y="1340" fill="#2a7040" font-size="7" font-family="Inter">stores</text>
+
+<!-- ══ APP → TECH ARROWS ══ -->
+<!-- Сервис поиска/записи → Веб-сервер -->
+<line x1="509" y1="720" x2="182" y2="1116" stroke="#4a7fcb" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arr-blue)"/>
+<text x="290" y="910" fill="#3a6fba" font-size="7.5" font-family="Inter" transform="rotate(-40,290,910)">used by</text>
+
+<!-- Сервис поиска/записи → БД транзакционная -->
+<line x1="509" y1="720" x2="346" y2="1116" stroke="#4a7fcb" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arr-blue)"/>
+
+<!-- Сервис уведомлений → Почтовый сервер -->
+<line x1="681" y1="720" x2="844" y2="1116" stroke="#4a7fcb" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arr-blue)"/>
+<text x="790" y="910" fill="#3a6fba" font-size="7.5" font-family="Inter">used by</text>
+
+<!-- Сервис уведомлений → Брокер -->
+<line x1="681" y1="720" x2="681" y2="1116" stroke="#4a7fcb" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arr-blue)"/>
+
+<!-- Сервис аналитики → БД аналитическая -->
+<line x1="844" y1="720" x2="514" y2="1116" stroke="#4a7fcb" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arr-blue)"/>
+
+<!-- Сервис отзывов → БД аналитическая -->
+<line x1="1002" y1="720" x2="514" y2="1116" stroke="#4a7fcb" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arr-blue)"/>
+
+<!-- Клиентский портал → CDN -->
+<line x1="182" y1="720" x2="995" y2="1116" stroke="#4a7fcb" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arr-blue)"/>
+
+<!-- layer divider labels -->
+<text x="630" y="636" fill="#888" font-size="9" font-family="Inter" text-anchor="middle">▼ realized by / uses ▼</text>
+<text x="630" y="1076" fill="#888" font-size="9" font-family="Inter" text-anchor="middle">▼ used by / hosted on ▼</text>
+
+</svg>
+
+</body>
+</html>
