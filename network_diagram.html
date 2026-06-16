@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Сетевой график — VetPlatform</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0c0d12;
+  font-family: 'Inter', sans-serif;
+  color: #d8d4c8;
+  padding: 2rem;
+  min-width: 1500px;
+}
+
+h1 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #888;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+.subtitle {
+  font-size: 0.65rem;
+  color: #444;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.62rem;
+  color: #666;
+  font-family: 'JetBrains Mono', monospace;
+}
+.li-box {
+  width: 14px; height: 14px;
+  border-radius: 2px;
+}
+.li-line-crit {
+  width: 30px; height: 2px;
+  background: #e07070;
+}
+.li-line-norm {
+  width: 30px; height: 1px;
+  background: #555;
+}
+
+/* critical path total */
+.crit-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #e07070;
+  margin-bottom: 1.5rem;
+}
+
+svg { display: block; }
+
+</style>
+</head>
+<body>
+
+<h1>Сетевой график проекта</h1>
+<div class="subtitle">VetPlatform · Critical Path Method (CPM) · AON</div>
+
+<div class="legend">
+  <div class="li"><div class="li-box" style="background:#1a2a1a;border:1.5px solid #3a7a3a"></div> Инфраструктура / Проектирование</div>
+  <div class="li"><div class="li-box" style="background:#1a2035;border:1.5px solid #3a5a9a"></div> Бэкенд сервисы</div>
+  <div class="li"><div class="li-box" style="background:#2a1a2a;border:1.5px solid #7a3a9a"></div> Фронтенд</div>
+  <div class="li"><div class="li-box" style="background:#2a1a1a;border:1.5px solid #9a3a3a"></div> Финальные этапы</div>
+  <div class="li"><div class="li-box" style="background:#2a1a08;border:1.5px solid #c07030;border-radius:50%"></div> Критический путь</div>
+  <div class="li"><div class="li-line-crit"></div> Критический путь</div>
+  <div class="li"><div class="li-line-norm"></div> Обычная зависимость</div>
+</div>
+
+<div class="crit-info">Критический путь: WP1 → WP2 → WP3 → WP6 → WP7 → WP12 → WP14 → WP15 = <strong>19 недель</strong></div>
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1460" height="920" style="background:#0e0f14;border:1px solid #1a1b22;border-radius:4px;">
+<defs>
+  <!-- arrows -->
+  <marker id="arr-crit" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+    <polygon points="0,0 8,3 0,6" fill="#e07070"/>
+  </marker>
+  <marker id="arr-norm" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+    <polygon points="0,0 8,3 0,6" fill="#555"/>
+  </marker>
+  <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+    <polygon points="0,0 8,3 0,6" fill="#4a7fcb"/>
+  </marker>
+
+  <!-- node templates -->
+  <!-- Normal node -->
+  <symbol id="node-tpl" viewBox="0 0 160 80">
+    <!-- ES | Duration | EF -->
+    <line x1="0" y1="22" x2="160" y2="22" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+    <!-- LS | Float | LF -->
+    <line x1="0" y1="58" x2="160" y2="58" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+    <!-- vertical dividers top -->
+    <line x1="46" y1="0" x2="46" y2="22" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+    <line x1="114" y1="0" x2="114" y2="22" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+    <!-- vertical dividers bottom -->
+    <line x1="46" y1="58" x2="46" y2="80" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+    <line x1="114" y1="58" x2="114" y2="80" stroke="currentColor" stroke-width="0.8" opacity="0.4"/>
+  </symbol>
+</defs>
+
+<!-- ═══════════════════════════════════════════
+     HELPER: draw nodes as groups
+     Node structure:
+     ┌────┬──────┬────┐
+     │ ES │  ID  │ EF │
+     ├────┴──────┴────┤
+     │     Name       │
+     ├────┬──────┬────┤
+     │ LS │Float │ LF │
+     └────┴──────┴────┘
+═══════════════════════════════════════════ -->
+
+<!-- ── COLUMN 0: START ── -->
+<!-- WP1: Проектирование архитектуры -->
+<g transform="translate(30,380)">
+  <rect width="160" height="80" rx="3" fill="#1a2a1a" stroke="#3a7a3a" stroke-width="1.5"/>
+  <!-- critical highlight -->
+  <rect width="160" height="80" rx="3" fill="none" stroke="#e07070" stroke-width="2.5" opacity="0.6"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#3a7a3a" stroke-width="0.8"/>
+  <!-- ES -->
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">0</text>
+  <!-- ID + Duration -->
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP1</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">2 нед</text>
+  <!-- EF -->
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">2</text>
+  <!-- Name -->
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">Проектирование</text>
+  <text x="80" y="49" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter">архитектуры</text>
+  <!-- LS -->
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">0</text>
+  <!-- Float -->
+  <text x="80" y="73" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono">R=0</text>
+  <!-- LF -->
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">2</text>
+</g>
+
+<!-- ── COLUMN 1: WP2 ── -->
+<!-- WP2: Проектирование схем БД -->
+<g transform="translate(250,380)">
+  <rect width="160" height="80" rx="3" fill="#1a2a1a" stroke="#3a7a3a" stroke-width="1.5"/>
+  <rect width="160" height="80" rx="3" fill="none" stroke="#e07070" stroke-width="2.5" opacity="0.6"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#3a7a3a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">2</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP2</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">1 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">3</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">Проектирование</text>
+  <text x="80" y="49" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter">схем БД</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">2</text>
+  <text x="80" y="73" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono">R=0</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">3</text>
+</g>
+
+<!-- ── COLUMN 2: WP3 ── -->
+<!-- WP3: Настройка AWS -->
+<g transform="translate(470,380)">
+  <rect width="160" height="80" rx="3" fill="#1a2a1a" stroke="#3a7a3a" stroke-width="1.5"/>
+  <rect width="160" height="80" rx="3" fill="none" stroke="#e07070" stroke-width="2.5" opacity="0.6"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#3a7a3a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#3a7a3a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">3</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP3</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">1 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">4</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">Настройка</text>
+  <text x="80" y="49" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter">инфраструктуры AWS</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">3</text>
+  <text x="80" y="73" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono">R=0</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">4</text>
+</g>
+
+<!-- ── COLUMN 3: Parallel services ── -->
+<!-- WP4: registration-service (top) -->
+<g transform="translate(690,120)">
+  <rect width="160" height="80" rx="3" fill="#1a2035" stroke="#3a5a9a" stroke-width="1.5"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">4</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP4</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">2 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">6</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">registration-service</text>
+  <text x="80" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">RDS PostgreSQL</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">5</text>
+  <text x="80" y="73" text-anchor="middle" fill="#5fb8c4" font-size="8" font-family="JetBrains Mono">R=1</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">7</text>
+</g>
+
+<!-- WP5: search-service (upper-mid) -->
+<g transform="translate(690,240)">
+  <rect width="160" height="80" rx="3" fill="#1a2035" stroke="#3a5a9a" stroke-width="1.5"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">4</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP5</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">3 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">search-service</text>
+  <text x="80" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">+ OpenSearch</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">4</text>
+  <text x="80" y="73" text-anchor="middle" fill="#5fb8c4" font-size="8" font-family="JetBrains Mono">R=0</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">7</text>
+</g>
+
+<!-- WP6: appointment-service (critical, mid) -->
+<g transform="translate(690,380)">
+  <rect width="160" height="80" rx="3" fill="#1a2035" stroke="#3a5a9a" stroke-width="1.5"/>
+  <rect width="160" height="80" rx="3" fill="none" stroke="#e07070" stroke-width="2.5" opacity="0.6"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">4</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP6</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">3 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">appointment-service</text>
+  <text x="80" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">+ MSK Kafka</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">4</text>
+  <text x="80" y="73" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono">R=0</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">7</text>
+</g>
+
+<!-- WP9: review-service (lower-mid) -->
+<g transform="translate(690,520)">
+  <rect width="160" height="80" rx="3" fill="#1a2035" stroke="#3a5a9a" stroke-width="1.5"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">4</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP9</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">3 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">review-service</text>
+  <text x="80" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">+ DocumentDB</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">4</text>
+  <text x="80" y="73" text-anchor="middle" fill="#5fb8c4" font-size="8" font-family="JetBrains Mono">R=0</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">7</text>
+</g>
+
+<!-- ── COLUMN 4: After WP6 ── -->
+<!-- WP7: notification-service (critical) -->
+<g transform="translate(910,310)">
+  <rect width="160" height="80" rx="3" fill="#1a2035" stroke="#3a5a9a" stroke-width="1.5"/>
+  <rect width="160" height="80" rx="3" fill="none" stroke="#e07070" stroke-width="2.5" opacity="0.6"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP7</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">2 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">9</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">notification-service</text>
+  <text x="80" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">SES + Kafka Consumer</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="80" y="73" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono">R=0</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">9</text>
+</g>
+
+<!-- WP8: auto-confirm-service -->
+<g transform="translate(910,430)">
+  <rect width="160" height="80" rx="3" fill="#1a2035" stroke="#3a5a9a" stroke-width="1.5"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP8</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">2 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">9</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">auto-confirm-service</text>
+  <text x="80" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">Amazon Connect</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="80" y="73" text-anchor="middle" fill="#5fb8c4" font-size="8" font-family="JetBrains Mono">R=1</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">10</text>
+</g>
+
+<!-- WP10: analytics-service -->
+<g transform="translate(910,560)">
+  <rect width="160" height="80" rx="3" fill="#1a2035" stroke="#3a5a9a" stroke-width="1.5"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP10</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">2 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">9</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">analytics-service</text>
+  <text x="80" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">Kafka Consumer</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="80" y="73" text-anchor="middle" fill="#5fb8c4" font-size="8" font-family="JetBrains Mono">R=1</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">10</text>
+</g>
+
+<!-- WP11: clinic-integration Lambda -->
+<g transform="translate(910,680)">
+  <rect width="160" height="80" rx="3" fill="#1a2035" stroke="#3a5a9a" stroke-width="1.5"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#3a5a9a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP11</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">2 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">9</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">clinic-integration</text>
+  <text x="80" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">Lambda + SQS</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="80" y="73" text-anchor="middle" fill="#5fb8c4" font-size="8" font-family="JetBrains Mono">R=1</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">10</text>
+</g>
+
+<!-- ── COLUMN 5: Frontend ── -->
+<!-- WP12: Pet Owner App (critical) -->
+<g transform="translate(1130,240)">
+  <rect width="165" height="80" rx="3" fill="#2a1a2a" stroke="#7a3a9a" stroke-width="1.5"/>
+  <rect width="165" height="80" rx="3" fill="none" stroke="#e07070" stroke-width="2.5" opacity="0.6"/>
+  <line x1="0" y1="22" x2="165" y2="22" stroke="#7a3a9a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="165" y2="58" stroke="#7a3a9a" stroke-width="0.8"/>
+  <line x1="47" y1="0" x2="47" y2="22" stroke="#7a3a9a" stroke-width="0.8"/>
+  <line x1="118" y1="0" x2="118" y2="22" stroke="#7a3a9a" stroke-width="0.8"/>
+  <line x1="47" y1="58" x2="47" y2="80" stroke="#7a3a9a" stroke-width="0.8"/>
+  <line x1="118" y1="58" x2="118" y2="80" stroke="#7a3a9a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="82" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP12</text>
+  <text x="82" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">3 нед</text>
+  <text x="142" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">10</text>
+  <text x="82" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">Pet Owner App</text>
+  <text x="82" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">React · CloudFront</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="82" y="73" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono">R=0</text>
+  <text x="142" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">10</text>
+</g>
+
+<!-- WP13: Clinic Admin App -->
+<g transform="translate(1130,360)">
+  <rect width="165" height="80" rx="3" fill="#2a1a2a" stroke="#7a3a9a" stroke-width="1.5"/>
+  <line x1="0" y1="22" x2="165" y2="22" stroke="#7a3a9a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="165" y2="58" stroke="#7a3a9a" stroke-width="0.8"/>
+  <line x1="47" y1="0" x2="47" y2="22" stroke="#7a3a9a" stroke-width="0.8"/>
+  <line x1="118" y1="0" x2="118" y2="22" stroke="#7a3a9a" stroke-width="0.8"/>
+  <line x1="47" y1="58" x2="47" y2="80" stroke="#7a3a9a" stroke-width="0.8"/>
+  <line x1="118" y1="58" x2="118" y2="80" stroke="#7a3a9a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="82" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP13</text>
+  <text x="82" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">3 нед</text>
+  <text x="142" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">10</text>
+  <text x="82" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">Clinic Admin App</text>
+  <text x="82" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">React · CloudFront</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">7</text>
+  <text x="82" y="73" text-anchor="middle" fill="#5fb8c4" font-size="8" font-family="JetBrains Mono">R=0</text>
+  <text x="142" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">10</text>
+</g>
+
+<!-- ── COLUMN 6: Testing ── -->
+<!-- WP14: Тестирование (critical) -->
+<g transform="translate(1355,300)">
+  <rect width="160" height="80" rx="3" fill="#2a1a1a" stroke="#9a3a3a" stroke-width="1.5"/>
+  <rect width="160" height="80" rx="3" fill="none" stroke="#e07070" stroke-width="2.5" opacity="0.6"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#9a3a3a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#9a3a3a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#9a3a3a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#9a3a3a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#9a3a3a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#9a3a3a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">10</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP14</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">2 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">12</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">Тестирование</text>
+  <text x="80" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">E2E · Integration</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">10</text>
+  <text x="80" y="73" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono">R=0</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">12</text>
+</g>
+
+<!-- ── COLUMN 7: Deploy ── -->
+<!-- WP15: CI/CD + Deploy (critical) -->
+<g transform="translate(1280,820)">
+  <rect width="160" height="80" rx="3" fill="#2a1a1a" stroke="#9a3a3a" stroke-width="1.5"/>
+  <rect width="160" height="80" rx="3" fill="none" stroke="#e07070" stroke-width="2.5" opacity="0.6"/>
+  <line x1="0" y1="22" x2="160" y2="22" stroke="#9a3a3a" stroke-width="0.8"/>
+  <line x1="0" y1="58" x2="160" y2="58" stroke="#9a3a3a" stroke-width="0.8"/>
+  <line x1="46" y1="0" x2="46" y2="22" stroke="#9a3a3a" stroke-width="0.8"/>
+  <line x1="114" y1="0" x2="114" y2="22" stroke="#9a3a3a" stroke-width="0.8"/>
+  <line x1="46" y1="58" x2="46" y2="80" stroke="#9a3a3a" stroke-width="0.8"/>
+  <line x1="114" y1="58" x2="114" y2="80" stroke="#9a3a3a" stroke-width="0.8"/>
+  <text x="23" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">17</text>
+  <text x="80" y="11" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono" font-weight="600">WP15</text>
+  <text x="80" y="20" text-anchor="middle" fill="#888" font-size="7" font-family="JetBrains Mono">2 нед</text>
+  <text x="137" y="15" text-anchor="middle" fill="#7bc97e" font-size="9" font-family="JetBrains Mono">19</text>
+  <text x="80" y="36" text-anchor="middle" fill="#ddd" font-size="8.5" font-family="Inter" font-weight="500">CI/CD Pipeline</text>
+  <text x="80" y="49" text-anchor="middle" fill="#888" font-size="7.5" font-family="Inter">+ Деплой</text>
+  <text x="23" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">17</text>
+  <text x="80" y="73" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono">R=0</text>
+  <text x="137" y="73" text-anchor="middle" fill="#d47070" font-size="9" font-family="JetBrains Mono">19</text>
+</g>
+
+<!-- ═══════════════════════════════════════
+     ARROWS
+═══════════════════════════════════════ -->
+
+<!-- WP1 → WP2 (critical) -->
+<line x1="190" y1="420" x2="250" y2="420" stroke="#e07070" stroke-width="2" marker-end="url(#arr-crit)"/>
+
+<!-- WP2 → WP3 (critical) -->
+<line x1="410" y1="420" x2="470" y2="420" stroke="#e07070" stroke-width="2" marker-end="url(#arr-crit)"/>
+
+<!-- WP3 → WP4 -->
+<line x1="550" y1="380" x2="620" y2="280" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+<line x1="620" y1="280" x2="690" y2="200" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP3 → WP5 -->
+<line x1="550" y1="400" x2="630" y2="340" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+<line x1="630" y1="340" x2="690" y2="295" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP3 → WP6 (critical) -->
+<line x1="630" y1="420" x2="690" y2="420" stroke="#e07070" stroke-width="2" marker-end="url(#arr-crit)"/>
+
+<!-- WP3 → WP9 -->
+<line x1="550" y1="460" x2="620" y2="520" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+<line x1="620" y1="520" x2="690" y2="555" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP6 → WP7 (critical) -->
+<line x1="850" y1="400" x2="880" y2="380" stroke="#e07070" stroke-width="2" marker-end="url(#arr-crit)"/>
+<line x1="880" y1="380" x2="910" y2="360" stroke="#e07070" stroke-width="2" marker-end="url(#arr-crit)"/>
+
+<!-- WP6 → WP8 -->
+<line x1="850" y1="420" x2="910" y2="470" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP6 → WP10 -->
+<line x1="850" y1="440" x2="880" y2="560" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+<line x1="880" y1="560" x2="910" y2="590" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP6 → WP11 -->
+<line x1="850" y1="450" x2="880" y2="680" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+<line x1="880" y1="680" x2="910" y2="720" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP9 → WP10 -->
+<line x1="850" y1="580" x2="910" y2="595" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP4 → WP12 -->
+<line x1="850" y1="160" x2="990" y2="230" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+<line x1="990" y1="230" x2="1130" y2="270" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP5 → WP12 -->
+<line x1="850" y1="270" x2="990" y2="265" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+<line x1="990" y1="265" x2="1130" y2="270" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP6 → WP12 (critical) -->
+<line x1="850" y1="410" x2="990" y2="310" stroke="#e07070" stroke-width="2" marker-end="url(#arr-crit)"/>
+<line x1="990" y1="310" x2="1130" y2="285" stroke="#e07070" stroke-width="2" marker-end="url(#arr-crit)"/>
+
+<!-- WP6 → WP13 -->
+<line x1="850" y1="420" x2="990" y2="400" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+<line x1="990" y1="400" x2="1130" y2="395" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP7 → WP12 (critical) -->
+<line x1="1070" y1="340" x2="1130" y2="295" stroke="#e07070" stroke-width="2" marker-end="url(#arr-crit)"/>
+
+<!-- WP12 → WP14 (critical) -->
+<line x1="1295" y1="295" x2="1355" y2="330" stroke="#e07070" stroke-width="2" marker-end="url(#arr-crit)"/>
+
+<!-- WP13 → WP14 -->
+<line x1="1295" y1="410" x2="1355" y2="380" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP8 → WP14 -->
+<line x1="1070" y1="470" x2="1213" y2="380" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+<line x1="1213" y1="380" x2="1355" y2="360" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP10 → WP14 -->
+<line x1="1070" y1="600" x2="1213" y2="400" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+<line x1="1213" y1="400" x2="1355" y2="375" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP11 → WP14 -->
+<line x1="1070" y1="720" x2="1213" y2="420" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+<line x1="1213" y1="420" x2="1355" y2="390" stroke="#555" stroke-width="1.2" marker-end="url(#arr-norm)"/>
+
+<!-- WP14 → WP15 (critical) -->
+<line x1="1435" y1="380" x2="1435" y2="820" stroke="#e07070" stroke-width="2" marker-end="url(#arr-crit)"/>
+<line x1="1435" y1="820" x2="1440" y2="860" stroke="#e07070" stroke-width="2"/>
+
+<!-- ── NODE LEGEND bottom ── -->
+<rect x="30" y="840" width="340" height="60" rx="3" fill="#111318" stroke="#2a2b38" stroke-width="1"/>
+<text x="50" y="858" fill="#666" font-size="8" font-family="JetBrains Mono">Структура узла (AON):</text>
+<line x1="40" y1="862" x2="360" y2="862" stroke="#2a2b38" stroke-width="0.8"/>
+<text x="80" y="873" text-anchor="middle" fill="#7bc97e" font-size="8" font-family="JetBrains Mono">ES</text>
+<text x="200" y="873" text-anchor="middle" fill="#e8c98a" font-size="8" font-family="JetBrains Mono">ID · Длительность</text>
+<text x="320" y="873" text-anchor="middle" fill="#7bc97e" font-size="8" font-family="JetBrains Mono">EF</text>
+<line x1="40" y1="878" x2="360" y2="878" stroke="#2a2b38" stroke-width="0.8"/>
+<line x1="120" y1="862" x2="120" y2="898" stroke="#2a2b38" stroke-width="0.8"/>
+<line x1="280" y1="862" x2="280" y2="898" stroke="#2a2b38" stroke-width="0.8"/>
+<text x="80" y="892" text-anchor="middle" fill="#d47070" font-size="8" font-family="JetBrains Mono">LS</text>
+<text x="200" y="892" text-anchor="middle" fill="#5fb8c4" font-size="8" font-family="JetBrains Mono">R (резерв)</text>
+<text x="320" y="892" text-anchor="middle" fill="#d47070" font-size="8" font-family="JetBrains Mono">LF</text>
+
+<!-- Summary -->
+<text x="400" y="858" fill="#888" font-size="8.5" font-family="JetBrains Mono">ES = Early Start · EF = Early Finish</text>
+<text x="400" y="872" fill="#888" font-size="8.5" font-family="JetBrains Mono">LS = Late Start  · LF = Late Finish</text>
+<text x="400" y="886" fill="#888" font-size="8.5" font-family="JetBrains Mono">R  = Резерв времени (R=0 → критический путь)</text>
+
+</svg>
+
+</body>
+</html>
